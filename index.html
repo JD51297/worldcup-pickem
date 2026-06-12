@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matchday Huddle — World Cup 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#000; --panel:#1c1c1e; --panel-2:#2c2c2e; --line:rgba(255,255,255,.10);
+    --chalk:#f5f5f7; --muted:#9a9aa0; --gold:#e3a82b; --red:#ff453a; --green:#30d158; --blue:#0a84ff;
+    --shadow:0 12px 32px rgba(0,0,0,.5); --soft:0 2px 10px rgba(0,0,0,.3);
+    --glass:rgba(18,18,20,.72); --onaccent:#000;
+  }
+  html[data-theme="light"]{
+    --ink:#f5f5f7; --panel:#fff; --panel-2:#f0f0f2; --line:rgba(0,0,0,.09);
+    --chalk:#1d1d1f; --muted:#6e6e73; --gold:#a07408; --red:#de2f1e; --green:#1d8a43; --blue:#0071e3;
+    --shadow:0 12px 32px rgba(0,0,0,.10); --soft:0 1px 5px rgba(0,0,0,.06);
+    --glass:rgba(245,245,247,.78); --onaccent:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  html,body{background:var(--ink);color:var(--chalk);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    transition:background .4s ease,color .4s ease;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{min-height:100vh;display:flex;justify-content:center;padding:0 20px 72px}
+  .wrap{width:100%;max-width:760px}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* hero */
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:52px;margin-bottom:8px}
+  .brand{display:flex;flex-direction:column}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  h1{font-weight:700;font-size:clamp(40px,9vw,64px);letter-spacing:-.035em;line-height:1.02;
+     background:linear-gradient(135deg,var(--chalk) 55%,var(--muted));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 .b{display:block}
+  .sub{color:var(--muted);font-size:16px;line-height:1.5;margin-top:14px;max-width:46ch;font-weight:400}
+  .clock{text-align:right;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.04em;white-space:nowrap}
+  .clock b{display:block;color:var(--chalk);font-size:16px;font-weight:600;letter-spacing:.02em;margin-top:4px;font-variant-numeric:tabular-nums}
+
+  .rule{height:1px;background:var(--line);margin:26px 0 0}
+
+  /* frosted sticky toolbar */
+  .toolbar{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    padding:12px 20px;margin:0 -20px 16px;
+    background:var(--glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid var(--line)}
+  .btn{font-size:13px;font-weight:600;letter-spacing:.01em;background:var(--panel-2);color:var(--chalk);
+    border:none;border-radius:980px;padding:9px 16px;cursor:pointer;
+    transition:background .25s,color .25s,transform .15s cubic-bezier(.2,.8,.3,1.2),box-shadow .2s,opacity .2s}
+  .btn:hover{transform:scale(1.04);box-shadow:var(--soft)}
+  .btn:active{transform:scale(.96)}
+  .btn.gold{background:var(--gold);color:var(--onaccent)}
+  .btn:disabled{opacity:.5;cursor:wait;transform:none}
+  .stamp{font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:.01em;font-variant-numeric:tabular-nums;cursor:pointer}
+  .stamp:hover{color:var(--chalk);text-decoration:underline}
+  .tabs{display:flex;gap:4px;background:var(--panel-2);border-radius:980px;padding:3px;margin-right:4px}
+  .tab{font-size:13px;font-weight:600;background:transparent;color:var(--muted);border:none;border-radius:980px;padding:7px 15px;cursor:pointer;transition:background .25s,color .25s,transform .15s}
+  .tab:hover{color:var(--chalk)}
+  .tab:active{transform:scale(.95)}
+  .tab.active{background:var(--chalk);color:var(--ink)}
+  .diag{display:none;position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);padding:8vh 16px;cursor:pointer}
+  .diag.show{display:block}
+  .diag pre{max-width:680px;margin:0 auto;background:var(--panel);color:var(--chalk);border:1px solid var(--line);border-radius:18px;padding:20px 22px;
+    font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .spin{display:inline-block;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* scoreboard — Google-scores-style panel, separate from the pool */
+  .sbpanel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px 18px 12px;margin-top:14px;box-shadow:var(--soft);transition:background .4s}
+  .sbpanel:has(.scoreboard:empty){display:none}
+  .sbhead{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .sbhead .sbsrc{font-size:11px;font-weight:500;letter-spacing:.01em;text-transform:none;color:var(--muted)}
+  .sbhead2{margin-top:18px}
+  .scoreboard{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+  .scoreboard::-webkit-scrollbar{display:none}
+  .sbcard{flex:0 0 auto;width:178px;background:var(--panel-2);border:1px solid transparent;border-radius:14px;padding:12px 14px;cursor:pointer;
+    transition:transform .18s cubic-bezier(.2,.8,.3,1.2),box-shadow .2s,background .3s,border-color .2s}
+  .sbcard:hover{transform:translateY(-2px) scale(1.02);box-shadow:var(--shadow)}
+  .sbcard:active{transform:scale(.96)}
+  .sbstat{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;white-space:nowrap;overflow:hidden}
+  .sbstat .live{color:var(--red);display:inline-flex;align-items:center;gap:5px}
+  .sbstat .live .dot{width:5px;height:5px;border-radius:50%;background:var(--red);flex:0 0 auto}
+  .sbstat .ft{color:var(--green)}
+  .sbstat .sbg{color:var(--muted);font-weight:500;flex:0 0 auto}
+  .sbrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;line-height:1.8}
+  .sbrow .tm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--chalk);font-weight:500}
+  .sbrow .tm.dim{color:var(--muted)}
+  .sbrow b{font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px}
+  .sbrow b.w{color:var(--chalk)}
+  .sbgoals{margin-top:7px;padding-top:7px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  /* group tables */
+  .sbtables{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px}
+  .sbtables:empty{display:none}
+  .sbtables .sbhead2{grid-column:1/-1;margin-bottom:0}
+  .sbtable{background:var(--panel-2);border-radius:14px;padding:11px 13px}
+  .sbg2{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .sbtable table{width:100%;border-collapse:collapse}
+  .sbtable td{font-size:12.5px;padding:4px 3px;font-variant-numeric:tabular-nums;color:var(--chalk)}
+  .sbtable tr.h td{font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:5px}
+  .sbtable td.r{color:var(--muted);font-weight:600;width:16px}
+  .sbtable td.t{max-width:0;width:62%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+  .sbtable td.p{font-weight:700;text-align:right}
+  /* wide screens: full-height right rail — bets on the left, live scores on the right */
+  @media (min-width:1180px){
+    body{padding-right:412px}
+    .sbpanel{position:fixed;top:0;right:0;bottom:0;width:388px;margin:0;border:none;border-left:1px solid var(--line);border-radius:0;overflow-y:auto;padding:24px 22px 32px;z-index:6;box-shadow:none}
+    .scoreboard{flex-direction:column;overflow-x:visible;padding-bottom:2px}
+    .sbcard{width:auto}
+    .sbtables{grid-template-columns:1fr 1fr}
+  }
+
+  /* day strip — segmented pills */
+  .days{display:flex;gap:6px;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:none}
+  .days::-webkit-scrollbar{display:none}
+  .day{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 13px;cursor:pointer;text-align:center;min-width:60px;
+    transition:background .3s,border-color .2s,color .3s,transform .18s cubic-bezier(.2,.8,.3,1.2),box-shadow .2s}
+  .day:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--soft);border-color:transparent}
+  .day:active{transform:scale(.95)}
+  .day .dow{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+  .day .num{font-weight:700;font-size:19px;margin-top:2px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .day.ko .num{font-size:12.5px;font-weight:700;letter-spacing:.01em}
+  .day.active{background:var(--chalk);border-color:var(--chalk);color:var(--ink)}
+  .day.active .dow{color:var(--ink);opacity:.6}
+  .day.today-dot{position:relative}
+  .day.today-dot::after{content:"";position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+  .day.active.today-dot::after{background:var(--ink)}
+
+  /* talking points */
+  .points{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin:14px 0 18px;box-shadow:var(--soft);transition:background .4s}
+  .points h2{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  .points h2 .t{color:var(--muted);text-transform:none;letter-spacing:.01em;font-weight:500}
+  .points ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .points li{position:relative;padding-left:22px;font-size:14.5px;line-height:1.55;color:var(--chalk)}
+  .points li::before{content:"";position:absolute;left:4px;top:8.5px;width:6px;height:6px;background:var(--gold);border-radius:50%}
+
+  .daylabel{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--muted);margin:6px 4px 12px}
+
+  /* match cards */
+  .match{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:10px;position:relative;overflow:hidden;
+    box-shadow:var(--soft);transition:background .4s,border-color .3s,transform .2s cubic-bezier(.2,.8,.3,1),box-shadow .25s}
+  .match:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .match.ca::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);border-radius:0 3px 3px 0}
+  .row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+  .team{display:flex;flex-direction:column;gap:4px}
+  .team.away{align-items:flex-end;text-align:right}
+  .tname{font-weight:600;font-size:clamp(15px,3.4vw,19px);letter-spacing:-.015em;line-height:1.12}
+  .flag{font-size:11px;color:var(--red);font-weight:600;letter-spacing:.02em}
+  .mid{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:84px}
+  .score{font-weight:700;font-size:28px;letter-spacing:-.01em;display:flex;gap:9px;align-items:center;font-variant-numeric:tabular-nums}
+  .score .w{color:var(--green)}
+  .vs{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+  .ktime{font-weight:600;font-size:16px;color:var(--chalk);font-variant-numeric:tabular-nums}
+  .tag{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:980px;background:var(--panel-2);color:var(--muted)}
+  .tag.final{color:var(--green);background:color-mix(in srgb,var(--green) 12%,transparent)}
+  .tag.live{color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent);display:inline-flex;align-items:center;gap:5px}
+  .tag.live .dot{width:6px;height:6px;border-radius:50%;background:var(--red)}
+  .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:13px;padding-top:11px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);font-weight:500}
+  .wlink{font-size:12px;font-weight:600;white-space:nowrap}
+
+  /* picks */
+  .pool-row{display:flex;align-items:center;gap:7px;margin-top:12px;flex-wrap:wrap}
+  .pool-row .lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .pick{font-size:13px;font-weight:600;background:var(--panel-2);border:none;color:var(--chalk);border-radius:980px;padding:8px 14px;cursor:pointer;
+    transition:background .25s,color .25s,transform .15s cubic-bezier(.2,.8,.3,1.3),box-shadow .2s}
+  .pick:hover{transform:scale(1.05);box-shadow:var(--soft)}
+  .pick:active{transform:scale(.92)}
+  .pick.sel{background:var(--gold);color:var(--onaccent);box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 22%,transparent)}
+  .result-note{font-size:13px;font-weight:500;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);color:var(--muted)}
+  .result-note b{color:var(--chalk);font-weight:600}
+  .result-note .hit{color:var(--green);font-weight:700} .result-note .miss{color:var(--red);font-weight:700}
+
+  /* knockout stage cards */
+  .stagecard{background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 9%,var(--panel)),var(--panel) 60%);border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--soft)}
+  .stagecard .k{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .stagecard h3{font-weight:700;font-size:30px;margin:10px 0 10px;letter-spacing:-.03em}
+  .stagecard p{color:var(--muted);font-size:15px;line-height:1.6;max-width:54ch}
+
+  .cawatch{display:flex;align-items:center;gap:14px;background:color-mix(in srgb,var(--red) 7%,var(--panel));border:1px solid color-mix(in srgb,var(--red) 25%,transparent);border-radius:18px;padding:15px 18px;margin-top:18px;box-shadow:var(--soft)}
+  .cawatch .mark{font-weight:800;font-size:20px;color:var(--red);line-height:1;letter-spacing:-.02em}
+  .cawatch .txt{font-size:14px;line-height:1.5}.cawatch .txt b{font-weight:600}.cawatch .txt span{color:var(--muted)}
+
+  /* pool panel */
+  .pool{margin-top:28px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:var(--soft);transition:background .4s}
+  .pool .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .pool .head h2{font-weight:700;font-size:24px;letter-spacing:-.025em}
+  .pool .head .hint{font-size:12px;color:var(--muted);font-weight:500}
+  .joinbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .joinbar input{font-size:15px;background:var(--panel-2);border:1px solid transparent;color:var(--chalk);border-radius:12px;padding:11px 14px;flex:1;min-width:170px;transition:border-color .2s,background .3s}
+  .joinbar input:focus{outline:none;border-color:var(--gold)}
+  .joinbar input::placeholder{color:var(--muted)}
+  .who{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+  .who b{color:var(--gold);font-weight:600}
+  table.lb{width:100%;border-collapse:collapse;margin-top:6px}
+  table.lb th{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+  table.lb td{padding:11px 9px;border-bottom:1px solid var(--line);font-size:14.5px;transition:background .2s}
+  table.lb tbody tr:hover td{background:color-mix(in srgb,var(--gold) 5%,transparent)}
+  table.lb tr:last-child td{border-bottom:none}
+  table.lb .rank{font-weight:700;color:var(--muted);width:34px;font-variant-numeric:tabular-nums}
+  table.lb .me td{background:color-mix(in srgb,var(--gold) 7%,transparent)}
+  table.lb .me .nm{color:var(--gold);font-weight:600}
+  table.lb .pts{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  table.lb .det{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .lb-empty{color:var(--muted);font-size:14px;padding:16px 4px}
+
+  .whopicks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
+  .pcol{background:var(--panel-2);border-radius:12px;padding:9px 11px;min-width:0;transition:background .3s,opacity .3s}
+  .pcol .pk{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcol .pn{font-size:12.5px;line-height:1.4;word-break:break-word}
+  .pcol.wpick{background:color-mix(in srgb,var(--green) 10%,var(--panel-2))}.pcol.wpick .pk{color:var(--green)}
+  .pcol.lpick{opacity:.55}
+
+  .reslog{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .reslog .lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .reslog .sc{width:50px;background:var(--panel-2);border:1px solid transparent;color:var(--chalk);border-radius:10px;padding:8px;text-align:center;font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;transition:border-color .2s}
+  .reslog .sc:focus{outline:none;border-color:var(--gold)}
+  .reslog .dash{color:var(--muted)}
+
+  .modebar{font-size:12.5px;font-weight:500;line-height:1.55;letter-spacing:.005em;border-radius:14px;padding:11px 15px;margin-bottom:14px}
+  .modebar.ok{background:color-mix(in srgb,var(--green) 9%,transparent);color:var(--green)}
+  .modebar.warn{background:color-mix(in srgb,var(--gold) 10%,transparent);color:var(--gold)}
+  .modebar b{color:var(--chalk);font-weight:600}
+
+  footer{margin-top:32px;font-size:12px;letter-spacing:.01em;color:var(--muted);line-height:1.8;text-align:center;font-weight:400}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--glass);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid var(--line);color:var(--chalk);padding:11px 18px;border-radius:980px;font-size:13.5px;font-weight:500;opacity:0;
+    transition:opacity .25s,transform .25s cubic-bezier(.2,.8,.3,1.2);pointer-events:none;z-index:9;box-shadow:var(--shadow);white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:480px){.clock{text-align:left}.mid{min-width:68px}.top{padding-top:32px}}
+  @media (prefers-reduced-motion:no-preference){
+    .match,.stagecard{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+    @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+    .tag.live .dot{animation:pulse 1.1s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+    .score{animation:popin .45s cubic-bezier(.2,.9,.3,1.35) both}
+    @keyframes popin{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+    .points,.pool,.cawatch{animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+    table.lb tbody tr{animation:rise .35s ease both}
+    table.lb tbody tr:nth-child(1){animation-delay:.02s}
+    table.lb tbody tr:nth-child(2){animation-delay:.06s}
+    table.lb tbody tr:nth-child(3){animation-delay:.10s}
+    table.lb tbody tr:nth-child(4){animation-delay:.14s}
+    table.lb tbody tr:nth-child(5){animation-delay:.18s}
+    .result-note .hit{display:inline-block;animation:hitpop .5s cubic-bezier(.2,.9,.3,1.4)}
+    @keyframes hitpop{0%{transform:scale(.4)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+    .day.active{animation:tabpop .28s cubic-bezier(.2,.9,.3,1.3)}
+    @keyframes tabpop{from{transform:scale(.9)}to{transform:scale(1)}}
+    #themeBtn .ico{display:inline-block;transition:transform .45s cubic-bezier(.3,1.4,.4,1)}
+    #themeBtn:hover .ico{transform:rotate(42deg)}
+    h1{animation:heroin .7s cubic-bezier(.2,.7,.2,1) both}
+    .sub,.eyebrow{animation:heroin .7s .08s cubic-bezier(.2,.7,.2,1) both}
+    @keyframes heroin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <span class="eyebrow">Daily Huddle · 2-min update</span>
+      <h1>Matchday<span class="b">Board</span></h1>
+      <p class="sub">FIFA World Cup 2026 — 48 teams, 104 games, June 11 → July 19, across Canada, Mexico &amp; the USA.</p>
+    </div>
+    <div class="clock">Today<b id="todayLabel">—</b></div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab" id="tabBoard" onclick="setView('board')">Board</button>
+      <button class="tab" id="tabPicks" onclick="setView('picks')">Pick 'Em</button>
+    </div>
+    <button class="btn gold" id="liveBtn" onclick="fetchLive()">↻ Refresh live scores</button>
+    <button class="btn" id="todayBtn" onclick="goToday()">Jump to today</button>
+    <button class="btn" id="themeBtn" onclick="toggleTheme()" title="Switch theme"><span class="ico">☀</span>&nbsp;Light</button>
+    <span class="stamp" id="liveStamp" onclick="showDiag()" title="Tap for feed details"></span>
+  </div>
+  <div class="diag" id="diag" onclick="this.classList.remove('show')"></div>
+
+  <div id="modeBanner"></div>
+
+  <aside class="sbpanel" id="sbpanel">
+    <div class="sbhead">Current scoreboard <span class="sbsrc">live feed · auto-updates</span></div>
+    <div class="scoreboard" id="scoreboard"></div>
+    <div class="sbtables" id="sbtables"></div>
+  </aside>
+  <div class="days" id="days"></div>
+
+  <div id="pointsWrap"></div>
+
+  <div class="daylabel" id="dayLabel"></div>
+  <div id="matches"></div>
+
+  <div class="cawatch" id="cawatch"></div>
+
+  <div class="pool" id="poolSec">
+    <div class="head">
+      <h2>Office Pick 'Em</h2>
+      <span class="hint">1 pt per correct result · shared with the team</span>
+    </div>
+    <div id="poolBody"></div>
+    <div id="leaderboard"></div>
+  </div>
+  <div class="daylabel" id="pickLabel" style="display:none">Make your picks — next 7 days</div>
+  <div id="pickList"></div>
+
+  <footer>
+    Times shown in Saskatchewan time (no DST) · double-check kickoffs before the huddle<br>
+    Group stage Jun 11–27 · Round of 32 Jun 28 · Final Jul 19, MetLife Stadium (New Jersey)<br>
+    <span id="verTag"></span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- SCHEDULE (times in Central / Manitoba) ----------
+const M=(g,a,b,city,time,opt={})=>({g,a,b,city,time,...opt});
+const SCHEDULE = {
+  "2026-06-11":{dow:"THU",label:"Thursday, June 11 · Opening Day",matches:[
+    M("A","Mexico","South Africa","Mexico City",null,{sa:2,sb:0,status:"final"}),
+    M("A","South Korea","Czechia","Guadalajara",null,{sa:2,sb:1,status:"final"}),
+  ]},
+  "2026-06-12":{dow:"FRI",label:"Friday, June 12",matches:[
+    M("B","Canada","Bosnia & Herzegovina","Toronto","1:00 PM",{ca:1}),
+    M("D","USA","Paraguay","Los Angeles","7:00 PM"),
+  ]},
+  "2026-06-13":{dow:"SAT",label:"Saturday, June 13",matches:[
+    M("B","Qatar","Switzerland","Santa Clara","1:00 PM"),
+    M("C","Brazil","Morocco","New Jersey","4:00 PM"),
+    M("C","Haiti","Scotland","Boston","7:00 PM"),
+    M("D","Australia","Türkiye","Vancouver","10:00 PM"),
+  ]},
+  "2026-06-14":{dow:"SUN",label:"Sunday, June 14",matches:[
+    M("E","Germany","Curaçao","Houston","11:00 AM"),
+    M("F","Netherlands","Japan","Dallas","2:00 PM"),
+    M("E","Ivory Coast","Ecuador","Philadelphia","5:00 PM"),
+    M("F","Sweden","Tunisia","Monterrey","8:00 PM"),
+  ]},
+  "2026-06-15":{dow:"MON",label:"Monday, June 15",matches:[
+    M("H","Spain","Cape Verde","Atlanta","10:00 AM"),
+    M("G","Belgium","Egypt","Seattle","1:00 PM"),
+    M("H","Saudi Arabia","Uruguay","Miami","4:00 PM"),
+    M("G","Iran","New Zealand","Los Angeles","7:00 PM"),
+  ]},
+  "2026-06-16":{dow:"TUE",label:"Tuesday, June 16",matches:[
+    M("I","France","Senegal","New Jersey","1:00 PM"),
+    M("I","Iraq","Norway","Boston","4:00 PM"),
+    M("J","Argentina","Algeria","Kansas City","7:00 PM"),
+    M("J","Austria","Jordan","Dallas","10:00 PM"),
+  ]},
+  "2026-06-17":{dow:"WED",label:"Wednesday, June 17",matches:[
+    M("K","Portugal","DR Congo","TBD","11:00 AM"),
+    M("L","England","Croatia","TBD","2:00 PM"),
+    M("L","Ghana","Panama","TBD","5:00 PM"),
+    M("K","Uzbekistan","Colombia","TBD","8:00 PM"),
+  ]},
+  "2026-06-18":{dow:"THU",label:"Thursday, June 18",matches:[
+    M("A","Czechia","South Africa","Atlanta","10:00 AM"),
+    M("B","Switzerland","Bosnia & Herzegovina","TBD","1:00 PM"),
+    M("B","Canada","Qatar","Vancouver","4:00 PM",{ca:1}),
+    M("A","Mexico","South Korea","Guadalajara","7:00 PM"),
+  ]},
+  "2026-06-19":{dow:"FRI",label:"Friday, June 19",matches:[
+    M("D","USA","Australia","Seattle","1:00 PM"),
+    M("C","Scotland","Morocco","Boston","4:00 PM"),
+    M("C","Brazil","Haiti","Philadelphia","7:00 PM"),
+    M("D","Türkiye","Paraguay","Santa Clara","10:00 PM"),
+  ]},
+  "2026-06-20":{dow:"SAT",label:"Saturday, June 20",matches:[
+    M("F","Netherlands","Sweden","Houston","11:00 AM"),
+    M("E","Germany","Ivory Coast","Toronto","2:00 PM"),
+    M("E","Ecuador","Curaçao","Kansas City","6:00 PM"),
+    M("F","Tunisia","Japan","Monterrey","10:00 PM"),
+  ]},
+  "2026-06-21":{dow:"SUN",label:"Sunday, June 21",matches:[
+    M("H","Spain","Saudi Arabia","Atlanta","10:00 AM"),
+    M("G","Belgium","Iran","Los Angeles","1:00 PM"),
+    M("H","Uruguay","Cape Verde","Miami","4:00 PM"),
+    M("G","New Zealand","Egypt","Vancouver","7:00 PM"),
+  ]},
+  "2026-06-22":{dow:"MON",label:"Monday, June 22",matches:[
+    M("J","Argentina","Austria","Dallas","11:00 AM"),
+    M("I","France","Iraq","Philadelphia","3:00 PM"),
+    M("I","Norway","Senegal","TBD","6:00 PM"),
+    M("J","Jordan","Algeria","TBD","9:00 PM"),
+  ]},
+  "2026-06-23":{dow:"TUE",label:"Tuesday, June 23",matches:[
+    M("K","Portugal","Uzbekistan","TBD","11:00 AM"),
+    M("L","England","Ghana","Boston","2:00 PM"),
+    M("L","Panama","Croatia","TBD","5:00 PM"),
+    M("K","Colombia","DR Congo","TBD","8:00 PM"),
+  ]},
+  "2026-06-24":{dow:"WED",label:"Wednesday, June 24 · Group B & C finales",matches:[
+    M("B","Switzerland","Canada","Vancouver","1:00 PM",{ca:1}),
+    M("B","Bosnia & Herzegovina","Qatar","TBD","1:00 PM"),
+    M("C","Scotland","Brazil","Miami","4:00 PM"),
+    M("C","Morocco","Haiti","TBD","4:00 PM"),
+    M("A","Czechia","Mexico","Mexico City","7:00 PM"),
+    M("A","South Africa","South Korea","TBD","7:00 PM"),
+  ]},
+  "2026-06-25":{dow:"THU",label:"Thursday, June 25 · Group D, E & F finales",matches:[
+    M("E","Ecuador","Germany","New Jersey","2:00 PM"),
+    M("E","Curaçao","Ivory Coast","TBD","2:00 PM"),
+    M("F","Japan","Sweden","Dallas","5:00 PM"),
+    M("F","Tunisia","Netherlands","Kansas City","5:00 PM"),
+    M("D","Türkiye","USA","Los Angeles","8:00 PM"),
+    M("D","Paraguay","Australia","Santa Clara","8:00 PM"),
+  ]},
+  "2026-06-26":{dow:"FRI",label:"Friday, June 26 · Group G & H finales",matches:[
+    M("H","Cape Verde","Saudi Arabia","Houston","6:00 PM"),
+    M("H","Uruguay","Spain","Guadalajara","6:00 PM"),
+    M("G","Egypt","Iran","Seattle","9:00 PM"),
+    M("G","New Zealand","Belgium","Vancouver","9:00 PM"),
+  ]},
+  "2026-06-27":{dow:"SAT",label:"Saturday, June 27 · Group I, J, K & L finales",matches:[
+    M("I","France","Norway","TBD","TBD"),
+    M("I","Senegal","Iraq","TBD","TBD"),
+    M("J","Argentina","Jordan","TBD","TBD"),
+    M("J","Algeria","Austria","TBD","TBD"),
+    M("K","Portugal","Colombia","TBD","TBD"),
+    M("K","Uzbekistan","DR Congo","TBD","TBD"),
+    M("L","England","Panama","TBD","TBD"),
+    M("L","Croatia","Ghana","TBD","TBD"),
+  ]},
+  "2026-06-28":{dow:"SUN",label:"Round of 32",stage:"Knockouts · Round of 32",stageNote:"The 12 group winners, 12 runners-up, and the 8 best third-placed teams advance — 32 teams, 16 single-elimination matches running June 28 → July 3. New format, brand-new pressure.",matches:[]},
+  "2026-07-04":{dow:"SAT",label:"Round of 16",stage:"Knockouts · Round of 16",stageNote:"16 survivors, 8 matches, July 4 → 7. Win or fly home from here on out.",matches:[]},
+  "2026-07-09":{dow:"THU",label:"Quarter-finals",stage:"Knockouts · Quarter-finals",stageNote:"The final eight, July 9 → 11. One bad 90 minutes ends the dream.",matches:[]},
+  "2026-07-14":{dow:"TUE",label:"Semi-finals",stage:"Knockouts · Semi-finals",stageNote:"Four teams left, two matches — July 14 & 15. A nation's summer rides on each.",matches:[]},
+  "2026-07-18":{dow:"SAT",label:"Third-place match",stage:"The bronze final",stageNote:"The two semi-final losers play off for third on July 18.",matches:[]},
+  "2026-07-19":{dow:"SUN",label:"FINAL",stage:"The Final",stageNote:"MetLife Stadium, New Jersey — July 19, 1:00 PM SK kickoff. One match for the whole thing.",matches:[]},
+};
+
+const POINTS = {
+  "2026-06-11":["Mexico opened it all up with a 2-0 win over South Africa at the Azteca.","South Korea edged Czechia 2-1 in the nightcap."],
+  "2026-06-12":["🇨🇦 Canada opens at home vs Bosnia & Herzegovina, 1pm SK — chasing a first-ever World Cup win.","USA kick off tonight vs Paraguay, 7pm SK.","48 teams this year — games basically every day until the July 19 final."],
+  "2026-06-13":["Big one: Brazil vs Morocco, 4pm SK — last cup's surprise semifinalists.","Scotland make their bow vs Haiti, 7pm SK.","Switzerland & Qatar (Canada's group) clash at 1pm SK."],
+  "2026-06-14":["Germany begin vs Curaçao — the smallest nation ever at a World Cup.","Netherlands vs Japan at 2pm SK is the pick of the day.","Four-match Sunday."],
+  "2026-06-15":["Spain, among the favourites, open vs Cape Verde, 10am SK.","Belgium and Uruguay both in action — two dark horses.","Five games, first at 10am SK."],
+  "2026-06-16":["France get going vs Senegal, 1pm SK — reigning runners-up.","Champions Argentina start vs Algeria, 7pm SK — Messi's last dance.","Four matches today."],
+  "2026-06-17":["England open vs Croatia, 2pm SK — a 2018 semifinal rematch.","Portugal begin at 11am SK vs DR Congo.","Colombia and Ghana also get going."],
+  "2026-06-18":["🇨🇦 Canada's second match — vs Qatar in Vancouver, 4pm SK. A real shot at points.","Mexico vs South Korea closes the night, 7pm SK.","First round of group games wraps up."],
+  "2026-06-19":["🇨🇦 Canada rests — USA back out vs Australia, 1pm SK.","Brazil look to seal a spot vs Haiti, 7pm SK.","Scotland chase a first win vs Morocco."],
+  "2026-06-20":["Germany vs Ivory Coast in Toronto, 2pm SK — could decide Group E.","Netherlands aim to lock qualification vs Sweden.","Four matches on the slate."],
+  "2026-06-21":["Spain can clinch vs Saudi Arabia, 10am SK.","Belgium vs Iran at 1pm SK.","Egypt and New Zealand both fighting to stay alive."],
+  "2026-06-22":["Argentina vs Austria, 11am SK — title defence rolls on.","France vs Iraq at 3pm SK.","Senegal and Norway in a Group I scrap."],
+  "2026-06-23":["England vs Ghana in Boston, 2pm SK.","Portugal look to advance vs Uzbekistan.","Croatia and Colombia both need points."],
+  "2026-06-24":["🇨🇦 Canada's group finale — vs Switzerland in Vancouver, 1pm SK. Likely win-and-in.","Brazil vs Scotland and Mexico vs Czechia also decide spots.","Group B & C wrap — standings lock in."],
+  "2026-06-25":["USA's finale vs Türkiye, 8pm SK — qualification on the line.","Germany vs Ecuador headlines at 2pm SK.","Groups D, E & F all conclude tonight."],
+  "2026-06-26":["Spain finish up vs Uruguay, 6pm SK.","Belgium vs New Zealand and the Iran-Egypt decider.","Groups G & H wrap the penultimate day."],
+  "2026-06-27":["Final group day — France, Argentina, England, Portugal all close out.","Last chances to grab one of the 8 best third-place spots.","Knockout picture is set by tonight."],
+};
+
+// ---------- state ----------
+const ORDER = Object.keys(SCHEDULE).sort();
+// ============================================================
+//  SHARE WITH YOUR TEAM  — paste a Firebase Realtime Database
+//  URL below and everyone who opens this page shares one pool.
+//  Setup (free, ~3 min): see the instructions comment at the
+//  very bottom of this file. Leave blank to run local-only.
+// ============================================================
+const CONFIG = {
+  dbUrl: "https://worldcup-pickem-b0276-default-rtdb.firebaseio.com"
+};
+
+const POOL_KEY = "wc26_pool_v1";   // shared: everyone's picks + results
+const NAME_KEY = "wc26_me_v1";     // personal: who I am on this device
+const THEME_KEY = "wc26_theme_v1"; // personal: light/dark preference
+
+const APP_VER = "v9";              // bump on each deploy — visible in the footer & diagnostics
+
+function showDiag(){
+  const el=document.getElementById("diag");
+  const lines=(fetchLive&&fetchLive._log)||["No feed query has run yet — tap “Refresh live scores” first."];
+  el.innerHTML="<pre>Matchday Board "+APP_VER+" — feed diagnostics\n(tap anywhere to close, screenshot this if scores look wrong)\n\n"+lines.map(esc).join("\n")+"</pre>";
+  el.classList.add("show");
+}
+
+// ---------- theme ----------
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  const b=document.getElementById("themeBtn");
+  if(b) b.innerHTML = t==="light" ? '<span class="ico">☾</span>&nbsp;Dark' : '<span class="ico">☀</span>&nbsp;Light';
+}
+function toggleTheme(){
+  const t = document.documentElement.dataset.theme==="light" ? "dark" : "light";
+  applyTheme(t);
+  try{ localStorage.setItem(THEME_KEY,t); }catch(e){}
+}
+(function initTheme(){
+  let t=null;
+  try{ t=localStorage.getItem(THEME_KEY); }catch(e){}
+  if(!t) t = (window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",()=>applyTheme(t));
+  else applyTheme(t);
+})();
+let pool = { picks:{}, results:{}, live:{} };   // {picks:{player:{matchId:pick}}, results:{matchId:{a,b}}, live:{matchId:{a,b,ts}, _meta:{ts}}}
+let me = "";
+let current = null;
+
+function fmtKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function realToday(){ return fmtKey(new Date()); }
+function pickDefaultDay(){
+  const t = realToday();
+  if(SCHEDULE[t]) return t;
+  for(const d of ORDER){ if(d>=t) return d; }
+  return ORDER[ORDER.length-1];
+}
+function mid(date,m){return date+"|"+m.a+"|"+m.b;}
+// A match's result can come from a shared manual entry, a shared live score, or a baked-in score.
+function resultOf(date,m){
+  const id=mid(date,m);
+  const r = pool.results && pool.results[id];
+  if(r && r.a!=null && r.b!=null) return {a:+r.a,b:+r.b,src:"manual"};
+  const lv = pool.live && pool.live[id];
+  if(lv && lv.a!=null && lv.b!=null) return {a:+lv.a,b:+lv.b,src:"live"};
+  if((m.status==="final"||m.status==="live") && m.sa!=null && m.sb!=null) return {a:m.sa,b:m.sb,src:m.status};
+  return null;
+}
+function ocOf(r){ if(!r) return null; return r.a>r.b?'A':(r.b>r.a?'B':'D'); }
+
+// ---------- storage (shared DB > Claude storage > this browser) ----------
+function storeMode(){
+  if(CONFIG.dbUrl) return "db";
+  if(window.storage) return "claude";
+  return "local";
+}
+function dbRoot(){ return CONFIG.dbUrl.replace(/\/$/,""); }
+
+async function loadPool(){
+  const mode=storeMode();
+  try{
+    if(mode==="db"){
+      const res=await fetch(dbRoot()+"/"+POOL_KEY+".json",{cache:"no-store"});
+      if(!res.ok) throw new Error("HTTP "+res.status);   // 401 = locked rules; 404 = wrong URL/region
+      const j=await res.json();
+      if(j && typeof j==="object") pool=j;
+      loadPool._dbOk=true;
+    }else if(mode==="claude"){
+      const r=await window.storage.get(POOL_KEY,true);
+      if(r && r.value) pool=JSON.parse(r.value);
+    }else{
+      const v=localStorage.getItem(POOL_KEY);
+      if(v) pool=JSON.parse(v);
+    }
+  }catch(e){
+    if(mode==="db") loadPool._dbOk=false;  // reachable database would not throw — flag it for the banner
+  }
+  if(!pool.picks) pool.picks={};
+  if(!pool.results) pool.results={};
+  if(!pool.live) pool.live={};
+}
+
+// Save only my picks node so two people saving at once don't clobber each other.
+async function saveMyPicks(){
+  const mode=storeMode();
+  try{
+    if(mode==="db"){
+      await fetch(dbRoot()+"/"+POOL_KEY+"/picks/"+dbKey(me)+".json",
+        {method:"PUT",body:JSON.stringify(pool.picks[me]||{})});
+    }else if(mode==="claude"){
+      await window.storage.set(POOL_KEY,JSON.stringify(pool),true);
+    }else{
+      localStorage.setItem(POOL_KEY,JSON.stringify(pool));
+    }
+  }catch(e){ toast("Couldn't save your pick — try again"); }
+}
+
+async function saveResult(id){
+  const mode=storeMode();
+  try{
+    if(mode==="db"){
+      await fetch(dbRoot()+"/"+POOL_KEY+"/results/"+dbKey(id)+".json",
+        {method:"PUT",body:JSON.stringify(pool.results[id]??null)});
+    }else if(mode==="claude"){
+      await window.storage.set(POOL_KEY,JSON.stringify(pool),true);
+    }else{
+      localStorage.setItem(POOL_KEY,JSON.stringify(pool));
+    }
+  }catch(e){ toast("Couldn't save result — try again"); }
+}
+
+// Remove a manually-entered final (fat-finger fix) and re-pull from the live feed.
+async function clearResult(id){
+  delete pool.results[id];
+  await saveResult(id);
+  toast("Score cleared — refreshing from live feed");
+  render();
+  fetchLive(true);
+}
+
+// Firebase keys can't contain . # $ [ ] /
+function dbKey(s){ return String(s).replace(/[.#$\[\]\/]/g,"_"); }
+
+// Sync a live (in-progress) score — or the fetch timestamp — to the shared store.
+async function saveLive(id){
+  const mode=storeMode();
+  try{
+    if(mode==="db"){
+      await fetch(dbRoot()+"/"+POOL_KEY+"/live/"+dbKey(id)+".json",
+        {method:"PUT",body:JSON.stringify(pool.live[id]??null)});
+    }else if(mode==="claude"){
+      await window.storage.set(POOL_KEY,JSON.stringify(pool),true);
+    }else{
+      localStorage.setItem(POOL_KEY,JSON.stringify(pool));
+    }
+  }catch(e){ /* non-critical */ }
+}
+
+async function loadMe(){
+  try{
+    if(window.storage){ const r=await window.storage.get(NAME_KEY,false); if(r&&r.value) me=r.value; }
+    else { const v=localStorage.getItem(NAME_KEY); if(v) me=v; }
+  }catch(e){}
+}
+async function saveMe(){
+  try{ if(window.storage) await window.storage.set(NAME_KEY,me,false); else localStorage.setItem(NAME_KEY,me); }catch(e){}
+}
+async function clearMe(){
+  try{ if(window.storage) await window.storage.delete(NAME_KEY,false); else localStorage.removeItem(NAME_KEY); }catch(e){}
+}
+
+// ---------- elements ----------
+const daysEl=document.getElementById("days");
+const matchesEl=document.getElementById("matches");
+const pointsWrap=document.getElementById("pointsWrap");
+const dayLabel=document.getElementById("dayLabel");
+const cawatch=document.getElementById("cawatch");
+const poolBody=document.getElementById("poolBody");
+const lbEl=document.getElementById("leaderboard");
+const toastEl=document.getElementById("toast");
+
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>toastEl.classList.remove("show"),2200);}
+
+// ---------- render ----------
+function buildDays(){
+  const today=realToday();
+  daysEl.innerHTML="";
+  ORDER.forEach(date=>{
+    const d=SCHEDULE[date];
+    const el=document.createElement("button");
+    const isKO=!!d.stage;
+    el.className="day"+(date===current?" active":"")+(date===today?" today-dot":"")+(isKO?" ko":"");
+    const label=isKO ? d.label.replace("Round of ","R").replace("Quarter-finals","QF").replace("Semi-finals","SF").replace("Third-place match","3RD").replace("FINAL","FINAL") : parseInt(date.slice(-2),10);
+    el.innerHTML=`<div class="dow">${d.dow}</div><div class="num">${label}</div>`;
+    el.onclick=()=>{current=date;render();};
+    daysEl.appendChild(el);
+  });
+  // keep active tab in view
+  const act=daysEl.querySelector(".day.active");
+  if(act) act.scrollIntoView({inline:"center",block:"nearest"});
+}
+
+function matchCard(date,m,idx,withPicks){
+  const id=mid(date,m);
+  const delay=idx?` style="animation-delay:${Math.min(idx*70,420)}ms"`:"";
+  const r=resultOf(date,m);
+  const isLive=r&&r.src==="live";
+  const isFinal=r&&(r.src==="final"||r.src==="manual");
+  const settled=!!r;
+  const oc=ocOf(r);
+  const aW=oc==='A', bW=oc==='B';
+  const flag=m.ca?'<span class="flag">🇨🇦 Canada</span>':'';
+  let midHtml;
+  if(settled){
+    const lv=pool.live&&pool.live[id];
+    const liveLbl=(isLive&&lv&&lv.clk)?esc(lv.clk):"Live";
+    midHtml=`<div class="score"><span class="${aW?'w':''}">${r.a}</span><span style="color:var(--muted)">–</span><span class="${bW?'w':''}">${r.b}</span></div>`
+      + (isLive?`<span class="tag live"><span class="dot"></span>${liveLbl}</span>`:`<span class="tag final">Full time</span>`);
+  }else{
+    midHtml=`<div class="ktime">${m.time||'TBD'}</div><span class="vs">${m.status==="pre"?"Not started":"vs"}</span>`;
+  }
+
+  let poolHtml="";
+  if(withPicks){
+  // (1) your pick controls (upcoming) or your result line (settled)
+  if(me){
+    const myPick=(pool.picks[me]||{})[id];
+    if(!settled){
+      const sel=v=>myPick===v?' sel':'';
+      poolHtml+=`<div class="pool-row"><span class="lbl">Your pick</span>
+        <button class="pick${sel('A')}" onclick="setPick('${id}','A')">${esc(m.a)}</button>
+        <button class="pick${sel('D')}" onclick="setPick('${id}','D')">Draw</button>
+        <button class="pick${sel('B')}" onclick="setPick('${id}','B')">${esc(m.b)}</button></div>`;
+    }else if(oc && myPick){
+      const hit=myPick===oc, lab=myPick==='A'?m.a:(myPick==='B'?m.b:'Draw');
+      poolHtml+=`<div class="result-note">You picked <b>${esc(lab)}</b> — <span class="${hit?'hit':'miss'}">${hit?'✓ +1':'✗ 0'}</span></div>`;
+    }
+  }
+  // manually-entered finals can be cleared if someone fat-fingered a score
+  if(isFinal && r.src==="manual"){
+    poolHtml+=`<div class="result-note">Score entered manually · <a href="#" onclick="clearResult('${esc(id)}');return false">Wrong? Tap to clear</a></div>`;
+  }
+  // (2) everyone's picks (visible to all)
+  const breakdown=pickBreakdown(id,m,oc);
+  if(breakdown) poolHtml+=breakdown;
+  // (3) result entry — anyone can log the final score, but only once a game could plausibly be done
+  if(!settled && m.status!=="pre" && date<=realToday()){
+    poolHtml+=`<div class="reslog">
+      <span class="lbl">Final score</span>
+      <input class="sc" id="ra_${id}" type="number" min="0" inputmode="numeric" placeholder="–">
+      <span class="dash">–</span>
+      <input class="sc" id="rb_${id}" type="number" min="0" inputmode="numeric" placeholder="–">
+      <button class="pick" onclick="logResult('${id}')">Save</button>
+    </div>`;
+  }
+  }
+
+  const q=encodeURIComponent(`${m.a} vs ${m.b} World Cup 2026`);
+  const watch = isFinal
+    ? `<a class="wlink" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${q}+highlights">Highlights&nbsp;↗</a>`
+    : `<a class="wlink" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(`watch ${m.a} vs ${m.b} world cup live`)}">${isLive?'Watch live':'Where to watch'}&nbsp;↗</a>`;
+  return `<div class="match ${m.ca?'ca':''}"${delay}>
+    <div class="row">
+      <div class="team home"><span class="tname">${esc(m.a)}</span>${m.ca&&/canada/i.test(m.a)?flag:''}</div>
+      <div class="mid">${midHtml}</div>
+      <div class="team away"><span class="tname">${esc(m.b)}</span>${m.ca&&/canada/i.test(m.b)?flag:''}</div>
+    </div>
+    <div class="meta"><span>Group ${m.g} · ${esc(m.city)}${settled?'':' · SK'}</span>${watch}</div>
+    ${poolHtml}
+  </div>`;
+}
+
+// Show who picked what for a match (everyone can see).
+function pickBreakdown(id,m,oc){
+  const groups={A:[],D:[],B:[]};
+  for(const [name,picks] of Object.entries(pool.picks)){
+    const p=picks[id]; if(p&&groups[p]) groups[p].push(name);
+  }
+  const total=groups.A.length+groups.D.length+groups.B.length;
+  if(total===0) return "";
+  const cell=(key,label)=>{
+    const names=groups[key];
+    const win=oc&&oc===key;
+    const lose=oc&&oc!==key;
+    const cls=win?'wpick':(lose?'lpick':'');
+    return `<div class="pcol ${cls}"><div class="pk">${esc(label)}${win?' ✓':''}</div>
+      <div class="pn">${names.length?names.map(esc).join(', '):'—'}</div></div>`;
+  };
+  return `<div class="whopicks">${cell('A',m.a)}${cell('D','Draw')}${cell('B',m.b)}</div>`;
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function gotoDay(date){ if(SCHEDULE[date]){ if(curView()==='picks') location.hash=''; current=date; render(); } }
+
+// ---------- views: Board (clean scores) vs Pick 'Em (voting lives here) ----------
+function curView(){ return location.hash==='#picks' ? 'picks' : 'board'; }
+function setView(v){ location.hash = v==='picks' ? '#picks' : ''; }
+window.addEventListener('hashchange', ()=>render());
+
+// The Pick 'Em page: every match in the next 7 days with pick buttons, grouped by day.
+function renderPickList(){
+  const el=document.getElementById("pickList"); if(!el)return;
+  const today=realToday(), dayMs=24*3600*1000, base=new Date(today+"T12:00:00");
+  let html="", n=0;
+  for(let o=0;o<7;o++){
+    const date=fmtKey(new Date(base.getTime()+o*dayMs));
+    const d=SCHEDULE[date]; if(!d||!d.matches||!d.matches.length)continue;
+    const lbl=o===0?"Today":(o===1?"Tomorrow":new Date(date+"T12:00:00").toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
+    html+=`<div class="daylabel">${lbl} · ${d.matches.length} match${d.matches.length>1?'es':''}</div>`;
+    html+=d.matches.map((m,i)=>matchCard(date,m,i,true)).join("");
+    n+=d.matches.length;
+  }
+  el.innerHTML = n ? html : '<div class="stagecard"><p>No matches to pick in the next 7 days.</p></div>';
+}
+
+// At-a-glance panel: today first, then yesterday's finals, then tomorrow's preview.
+function renderScoreboard(){
+  const el=document.getElementById("scoreboard"); if(!el)return;
+  const today=realToday();
+  const dayMs=24*3600*1000, base=new Date(today+"T12:00:00");
+  const yday=fmtKey(new Date(base.getTime()-dayMs)), tmrw=fmtKey(new Date(base.getTime()+dayMs));
+  const lblFor=d=>d===today?"Today":(d===yday?"Yesterday":"Tomorrow");
+  let html="";
+  for(const date of [today,yday,tmrw]){
+    const d=SCHEDULE[date]; if(!d||!d.matches)continue;
+    for(const m of d.matches){
+      const id=mid(date,m), r=resultOf(date,m);
+      const isLive=r&&r.src==="live", isFinal=r&&!isLive;
+      let stat, sa="", sb="", aW=false, bW=false;
+      if(isFinal){ stat=`<span class="ft">FT · ${lblFor(date)}</span>`; sa=r.a; sb=r.b; aW=r.a>r.b; bW=r.b>r.a; }
+      else if(isLive){
+        const lv=pool.live&&pool.live[id];
+        stat=`<span class="live"><span class="dot"></span>${lv&&lv.clk?esc(lv.clk):"Live"}</span>`;
+        sa=r.a; sb=r.b; aW=r.a>r.b; bW=r.b>r.a;
+      }
+      else stat=`<span>${lblFor(date)} · ${esc(m.time||"TBD")}</span>`; // Guardrail: not started → time, never 0–0
+      const goals=(m.scorers&&m.scorers.length)?`<div class="sbgoals" title="${esc(m.scorers.join(', '))}">⚽ ${esc(m.scorers.join(' · '))}</div>`:"";
+      html+=`<div class="sbcard" onclick="gotoDay('${date}')"><div class="sbstat">${stat}<span class="sbg">Grp ${esc(m.g||"")}</span></div>
+        <div class="sbrow"><span class="tm ${isFinal&&!aW?'dim':''}">${esc(m.a)}</span><b class="${aW?'w':''}">${sa}</b></div>
+        <div class="sbrow"><span class="tm ${isFinal&&!bW?'dim':''}">${esc(m.b)}</span><b class="${bW?'w':''}">${sb}</b></div>${goals}
+      </div>`;
+    }
+  }
+  el.innerHTML=html;  // empty window → CSS hides the whole strip
+  renderStandings();
+}
+
+// Group tables computed from final scores — same math as the official standings.
+function computeTables(){
+  const t={};
+  const row=n=>({n,P:0,W:0,D:0,L:0,GF:0,GA:0,Pts:0});
+  for(const date of ORDER){
+    const d=SCHEDULE[date]; if(!d.matches)continue;
+    for(const m of d.matches){
+      if(!m.g)continue;
+      const r=resultOf(date,m); if(!r||r.src==="live")continue;  // live games don't count yet
+      const g=t[m.g]||(t[m.g]={});
+      const A=g[m.a]||(g[m.a]=row(m.a)), B=g[m.b]||(g[m.b]=row(m.b));
+      A.P++;B.P++; A.GF+=r.a;A.GA+=r.b; B.GF+=r.b;B.GA+=r.a;
+      if(r.a>r.b){A.W++;B.L++;A.Pts+=3}
+      else if(r.b>r.a){B.W++;A.L++;B.Pts+=3}
+      else{A.D++;B.D++;A.Pts++;B.Pts++}
+    }
+  }
+  return t;
+}
+function renderStandings(){
+  const el=document.getElementById("sbtables"); if(!el)return;
+  const t=computeTables(), gs=Object.keys(t).sort();
+  if(!gs.length){ el.innerHTML=""; return; }
+  el.innerHTML=`<div class="sbhead sbhead2">Group tables <span class="sbsrc">from final scores</span></div>`
+    + gs.map(g=>{
+      const rows=Object.values(t[g]).sort((x,y)=>y.Pts-x.Pts||((y.GF-y.GA)-(x.GF-x.GA))||y.GF-x.GF);
+      return `<div class="sbtable"><div class="sbg2">Group ${esc(g)}</div><table><tr class="h"><td></td><td>Team</td><td>P</td><td>GD</td><td>Pts</td></tr>`
+        + rows.map((r,i)=>`<tr><td class="r">${i+1}</td><td class="t">${esc(r.n)}</td><td>${r.P}</td><td>${(r.GF-r.GA)>0?'+':''}${r.GF-r.GA}</td><td class="p">${r.Pts}</td></tr>`).join("")
+        + `</table></div>`;
+    }).join("");
+}
+
+function render(){
+  if(!current) current=pickDefaultDay();
+  document.getElementById("todayLabel").textContent=(()=>{const d=new Date();return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();})();
+  const view=curView();
+  const show=(id,on)=>{const e=document.getElementById(id);if(e)e.style.display=on?"":"none";};
+  document.getElementById("tabBoard").classList.toggle("active",view==="board");
+  document.getElementById("tabPicks").classList.toggle("active",view==="picks");
+  show("days",view==="board"); show("pointsWrap",view==="board"); show("dayLabel",view==="board");
+  show("matches",view==="board"); show("todayBtn",view==="board");
+  show("poolSec",view==="picks"); show("pickLabel",view==="picks"); show("pickList",view==="picks");
+  renderScoreboard();
+
+  if(view==="picks"){
+    cawatch.style.display="none";
+    renderPool();
+    renderPickList();
+    renderModeBanner();
+    return;
+  }
+
+  buildDays();
+  const d=SCHEDULE[current];
+
+  // talking points
+  const pts=POINTS[current];
+  pointsWrap.innerHTML = pts ? `<div class="points"><h2>Say this <span class="t">— ${d.dow.charAt(0)+d.dow.slice(1).toLowerCase()}'s talking points</span></h2><ul>${pts.map(p=>`<li>${p}</li>`).join("")}</ul></div>` : "";
+
+  if(d.stage){
+    dayLabel.textContent=d.label;
+    matchesEl.innerHTML=`<div class="stagecard"><div class="k">${esc(d.stage)}</div><h3>${esc(d.label)}</h3><p>${esc(d.stageNote)}</p></div>`;
+  }else{
+    dayLabel.textContent=d.label+` · ${d.matches.length} match${d.matches.length>1?'es':''}`;
+    matchesEl.innerHTML=d.matches.length?d.matches.map((m,i)=>matchCard(current,m,i,false)).join(""):'<div class="stagecard"><p>No matches scheduled.</p></div>';
+  }
+
+  // canada watch
+  const nc=nextCanada();
+  if(nc){cawatch.style.display="flex";cawatch.innerHTML=`<div class="mark">CA</div><div class="txt"><b>Canada watch:</b> ${nc.today?'in action today':'next up '+nc.when} vs ${esc(nc.opp)} <span>· ${nc.time} SK</span></div>`;}
+  else cawatch.style.display="none";
+
+  renderModeBanner();
+}
+
+function renderModeBanner(){
+  const el=document.getElementById("modeBanner");
+  const mode=storeMode();
+  if(mode==="db"){
+    if(loadPool._dbOk===false)
+      el.innerHTML=`<div class="modebar warn">⚠ Can't reach the team database. Two usual fixes: in Firebase → Realtime Database → <b>Rules</b>, set read &amp; write to <b>true</b> (test mode); or if the database was created outside the US, the URL ends in <b>.firebasedatabase.app</b> instead — update CONFIG.dbUrl. Live scores still work; picks are local until this is fixed.</div>`;
+    else
+      el.innerHTML=`<div class="modebar ok">✓ Shared pool connected — picks, results and the leaderboard sync for everyone. Live scores update automatically.</div>`;
+  }
+  else if(mode==="claude") el.innerHTML=`<div class="modebar ok">✓ Shared inside Claude — everyone viewing this shares one pool. Live scores update automatically.</div>`;
+  else el.innerHTML=`<div class="modebar warn">Live scores work, but picks stay in <b>this browser</b> only. To share the pool with the team, add a database URL near the top of the file (setup steps at the bottom).</div>`;
+}
+
+function nextCanada(){
+  const today=realToday();
+  for(const date of ORDER){
+    if(date<today) continue;
+    const d=SCHEDULE[date]; if(!d.matches) continue;
+    const m=d.matches.find(x=>x.ca && x.status!=="final");
+    if(m){const opp=/canada/i.test(m.a)?m.b:m.a;return{when:`${d.dow.charAt(0)+d.dow.slice(1).toLowerCase()}, Jun ${parseInt(date.slice(-2),10)}`,opp,time:m.time,today:date===today};}
+  }
+  return null;
+}
+
+// ---------- pool ----------
+function renderPool(){
+  if(!me){
+    const shareLine = storeMode()==="local"
+      ? "Heads up: this browser is in local-only mode, so picks won't sync to teammates yet."
+      : "Your name and picks are shared with everyone on this board.";
+    poolBody.innerHTML=`<div class="who">Join the pool to start picking match results. ${shareLine}</div>
+    <div class="joinbar"><input id="nameInput" placeholder="Your name" maxlength="24" onkeydown="if(event.key==='Enter')joinPool()"><button class="btn gold" onclick="joinPool()">Join pool</button></div>`;
+  }else{
+    poolBody.innerHTML=`<div class="who">Playing as <b>${esc(me)}</b> — tap a team under any upcoming match to pick. <a href="#" onclick="switchUser();return false;" style="color:var(--muted)">switch</a></div>`;
+  }
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  // every settled, non-live match counts toward scoring
+  const settled=[];
+  for(const date of ORDER){const d=SCHEDULE[date];if(!d.matches)continue;for(const m of d.matches){const r=resultOf(date,m);if(r&&r.src!=="live"){const oc=ocOf(r);if(oc)settled.push({id:mid(date,m),oc});}}}
+  const players=Object.keys(pool.picks);
+  if(players.length===0){lbEl.innerHTML=`<div class="lb-empty">No players yet — be the first to join.</div>`;return;}
+  const rows=players.map(p=>{
+    let pts=0,scored=0;
+    for(const s of settled){const pick=pool.picks[p][s.id];if(pick){scored++;if(pick===s.oc)pts++;}}
+    const pending=Object.keys(pool.picks[p]).length-scored;
+    return{p,pts,scored,pending};
+  }).sort((a,b)=>b.pts-a.pts||a.p.localeCompare(b.p));
+  lbEl.innerHTML=`<table class="lb"><thead><tr><th>#</th><th>Player</th><th style="text-align:right">Pending</th><th style="text-align:right">Points</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr class="${r.p===me?'me':''}"><td class="rank">${i+1}</td><td class="nm">${esc(r.p)}</td><td class="det">${r.pending}</td><td class="pts">${r.pts}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function logResult(id){
+  const a=document.getElementById("ra_"+id), b=document.getElementById("rb_"+id);
+  const av=a&&a.value!==""?parseInt(a.value,10):null, bv=b&&b.value!==""?parseInt(b.value,10):null;
+  if(av==null||bv==null||isNaN(av)||isNaN(bv)){toast("Enter both scores");return;}
+  if(av<0||bv<0||av>25||bv>25||!Number.isInteger(av)||!Number.isInteger(bv)){toast("That score doesn't look right — whole numbers 0–25");return;}
+  pool.results[id]={a:av,b:bv};
+  saveResult(id);
+  render();
+  toast("Result saved — leaderboard updated");
+}
+
+function joinPool(){
+  let v=(document.getElementById("nameInput").value||"").trim();
+  if(!v){toast("Enter a name first");return;}
+  if(CONFIG.dbUrl) v=v.replace(/[.#$\[\]\/]/g,"");   // keep names DB-key-safe
+  const returning = !!pool.picks[v] && Object.keys(pool.picks[v]).length>0;
+  me=v;
+  if(!pool.picks[me])pool.picks[me]={};
+  saveMe();
+  saveMyPicks();
+  render();
+  toast(returning ? ("Welcome back, "+me+" — your picks are loaded") : ("Welcome, "+me+" — start picking!"));
+}
+function switchUser(){me="";clearMe();render();}
+async function setPick(id,val){
+  if(!me){toast("Join the pool first");return;}
+  if(!pool.picks[me])pool.picks[me]={};
+  if(pool.picks[me][id]===val){ delete pool.picks[me][id]; } else { pool.picks[me][id]=val; }
+  await saveMyPicks();
+  render();
+}
+function goToday(){current=pickDefaultDay();render();}
+
+// ---------- live scores: ESPN first (works everywhere), Claude fallback ----------
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/&/g,"and").replace(/[-_./]/g," ").replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim();}
+// Providers name countries differently — map them to our schedule's names.
+const ALIAS={
+  "united states":"usa","united states of america":"usa","usmnt":"usa",
+  "czech republic":"czechia",
+  "turkey":"turkiye",
+  "cote divoire":"ivory coast","cote d ivoire":"ivory coast",
+  "korea republic":"south korea","republic of korea":"south korea",
+  "congo dr":"dr congo","democratic republic of congo":"dr congo","dr of congo":"dr congo",
+  "cabo verde":"cape verde","cape verde islands":"cape verde",
+  "ir iran":"iran",
+  "bosnia herzegovina":"bosnia and herzegovina","bosnia":"bosnia and herzegovina"
+};
+function canon(s){const n=norm(s);return ALIAS[n]||n;}
+function teamMatch(a,b){const x=canon(a),y=canon(b);if(!x||!y)return false;return x===y||x.includes(y)||y.includes(x);}
+
+// Apply one provider result (mapped to home/away of our schedule row) with guardrails.
+function applyScore(date,m,state,hs,as_,clk){
+  const id=mid(date,m);
+  if(state==="pre"){
+    // Guardrail: game hasn't started — never show scores, clear any stale live entry,
+    // and remove mistaken manual "finals" (you can't have a final score before kickoff).
+    m.status="pre"; m.sa=null; m.sb=null;
+    if(pool.live[id]){ delete pool.live[id]; saveLive(id); }
+    if(pool.results[id]){ delete pool.results[id]; saveResult(id); }
+    return 0;
+  }
+  if(hs==null||as_==null||isNaN(hs)||isNaN(as_)||hs<0||as_<0) return 0;  // Guardrail: no valid score, no update
+  if(state==="live"){
+    m.status="live"; m.sa=hs; m.sb=as_;
+    // Guardrail: the game is still being played — a manual "final" logged early can't be right.
+    if(pool.results[id]){ delete pool.results[id]; saveResult(id); }
+    pool.live[id]={a:hs,b:as_,clk:clk||"",ts:Date.now()};
+    saveLive(id);
+    return 1;
+  }
+  if(state==="final"){
+    m.status="final"; m.sa=hs; m.sb=as_;
+    pool.results[id]={a:hs,b:as_};
+    saveResult(id);
+    if(pool.live[id]){ delete pool.live[id]; saveLive(id); }
+    return 1;
+  }
+  return 0;
+}
+
+function matchInSchedule(nameA,nameB,cb){
+  for(const date of ORDER){
+    const d=SCHEDULE[date]; if(!d.matches)continue;
+    for(const m of d.matches){
+      const ab=teamMatch(m.a,nameA)&&teamMatch(m.b,nameB);
+      const ba=teamMatch(m.a,nameB)&&teamMatch(m.b,nameA);
+      if(ab||ba) return cb(date,m,ab);
+    }
+  }
+  return null;  // pairing not in our schedule (or names didn't match)
+}
+
+// ESPN serves scores as "1", 1, or {value:1,displayValue:"1"} depending on game state — handle all.
+function scoreNum(x){
+  if(x==null) return NaN;
+  if(typeof x==="object") x=(x.value!=null?x.value:x.displayValue);
+  return parseInt(x,10);
+}
+
+// Source 1: ESPN public scoreboard — free, no key, works in any browser.
+// Three queries: yesterday, today, and the default "current" board (no date param), deduped —
+// belt and suspenders in case the dates filter misbehaves.
+async function fetchESPN(){
+  const fmt=d=>fmtKey(d).replace(/-/g,"");
+  const qs=[`?dates=${fmt(new Date(Date.now()-24*3600*1000))}&limit=100`,`?dates=${fmt(new Date())}&limit=100`,`?limit=100`];
+  const responses=await Promise.all(qs.map(q=>
+    fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard${q}`,{cache:"no-store"})));
+  let events=[], seen={};
+  for(const res of responses){
+    if(!res.ok) throw new Error("scores service HTTP "+res.status);
+    const data=await res.json();
+    for(const ev of (data.events||[])){
+      const k=ev.id||JSON.stringify(ev.name)+ev.date;
+      if(seen[k])continue; seen[k]=1; events.push(ev);
+    }
+  }
+  // Guardrail: feed can include past tournaments — keep only this World Cup's events
+  events=events.filter(ev=>(ev.season&&Number(ev.season.year)===2026)||(ev.date&&String(ev.date)>="2026-06-01"));
+  const nameCandidates=t=>[t.displayName,t.shortDisplayName,t.name,t.location].filter(Boolean);
+  let updated=0;
+  fetchLive._log=["Feed query "+new Date().toLocaleTimeString()+" — "+events.length+" event(s) for WC2026:"];
+  for(const ev of events){
+    const c=ev.competitions&&ev.competitions[0]; if(!c)continue;
+    const comp=c.competitors||[]; if(comp.length<2)continue;
+    const home=comp.find(x=>x.homeAway==="home")||comp[0];
+    const away=comp.find(x=>x.homeAway==="away")||comp[1];
+    if(!home.team||!away.team)continue;
+    const st=(c.status&&c.status.type)||{};
+    const offWords=/postpon|cancel|abandon|suspend|delay/i.test((st.description||"")+" "+(st.detail||""));
+    const state=st.state==="pre"?"pre"
+      :(st.state==="in"?"live"
+      :(st.state==="post"&&!offWords?"final":null));  // some finals arrive without the completed flag
+    let hs=scoreNum(home.score), as_=scoreNum(away.score);
+    if((isNaN(hs)||isNaN(as_))&&Array.isArray(c.details)){
+      const hid=String((home.team&&home.team.id)||home.id||"");
+      let h=0,a=0;
+      for(const dt of c.details){
+        if(!dt.scoringPlay)continue;
+        const v=(dt.scoreValue!=null?dt.scoreValue:1);
+        if(String((dt.team&&dt.team.id)||"")===hid)h+=v; else a+=v;
+      }
+      hs=h; as_=a;
+    }
+    const clk=(c.status&&c.status.displayClock)||"";
+    let res=null;
+    if(state){
+      outer: for(const hn of nameCandidates(home.team)) for(const an of nameCandidates(away.team)){
+        res=matchInSchedule(hn,an,(date,m,ab)=>{
+          const n=applyScore(date,m,state,ab?hs:as_,ab?as_:hs,clk);
+          if(state!=="pre"){
+            try{
+              m.scorers=(c.details||[]).filter(x=>x.scoringPlay).map(x=>{
+                const nm=(x.athletesInvolved&&x.athletesInvolved[0]&&x.athletesInvolved[0].shortName)||"";
+                const ck=(x.clock&&x.clock.displayValue)||"";
+                return nm?(nm+" "+ck):"";
+              }).filter(Boolean).slice(0,8);
+            }catch(e){}
+          }else m.scorers=null;
+          return n;
+        });
+        if(res!==null) break outer;
+      }
+    }
+    const line=`${home.team.displayName} ${isNaN(hs)?"?":hs}-${isNaN(as_)?"?":as_} ${away.team.displayName} | ${st.state||"?"} ${st.detail||""} → ${state===null?"skipped ("+(st.name||"unknown status")+")":(res===null?"⚠ NO FIXTURE MATCH":"applied "+res)}`;
+    fetchLive._log.push(line);
+    console.log("[scores]",line);
+    if(res) updated+=res;
+  }
+  fetchLive._log.push(`Applied ${updated} update(s).`);
+  console.log("[scores] applied",updated,"update(s)");
+  return updated;
+}
+
+// Source 2: Claude API with web search — only available when running inside Claude.
+async function fetchViaClaude(){
+  const today=realToday();
+  const from=fmtKey(new Date(Date.now()-36*3600*1000));
+  const prompt=`Use web search to find 2026 FIFA World Cup match results. Return ONLY a JSON array (no prose, no markdown, no code fences) of every men's 2026 FIFA World Cup match with a kickoff dated between ${from} and ${today} inclusive. Each element must be exactly: {"teamA":string,"teamB":string,"scoreA":number or null,"scoreB":number or null,"status":"final" or "live" or "upcoming"}. Use null scores when a match hasn't started. Use common English country names (e.g. "South Korea","Ivory Coast","Türkiye"). If none, return [].`;
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,
+      messages:[{role:"user",content:prompt}],
+      tools:[{type:"web_search_20250305",name:"web_search"}]})
+  });
+  if(!res.ok) throw new Error("API HTTP "+res.status);
+  const data=await res.json();
+  if(data.error) throw new Error(data.error.message||data.error.type||"API error");
+  const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+  const s=text.indexOf("["),e=text.lastIndexOf("]");
+  if(s<0||e<0) throw new Error("couldn't parse scores");
+  const arr=JSON.parse(text.slice(s,e+1));
+  let updated=0;
+  for(const r of arr){
+    const state=r.status==="upcoming"?"pre":(r.status==="live"?"live":(r.status==="final"?"final":null));
+    if(!state)continue;
+    const n=matchInSchedule(r.teamA,r.teamB,(date,m,ab)=>applyScore(date,m,state,ab?r.scoreA:r.scoreB,ab?r.scoreB:r.scoreA,""));
+    if(n) updated+=n;
+  }
+  return updated;
+}
+
+async function fetchLive(silent){
+  if(fetchLive._busy) return; fetchLive._busy=true;
+  const btn=document.getElementById("liveBtn");
+  const old=btn.innerHTML;
+  if(!silent){ btn.disabled=true; btn.innerHTML='<span class="spin">↻</span>&nbsp;Updating…'; }
+  const t=()=>new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  try{
+    let updated;
+    try{ updated=await fetchESPN(); }
+    catch(e1){ updated=await fetchViaClaude(); }
+    pool.live._meta={ts:Date.now()};
+    saveLive("_meta");
+    fetchLive._fails=0;
+    document.getElementById("liveStamp").textContent = updated
+      ? `Updated ${updated} match${updated>1?'es':''} · ${t()}`
+      : `Up to date · ${t()}`;
+    render();
+    if(!silent) toast(updated?`Scores updated (${updated})`:"All scores up to date");
+  }catch(err){
+    fetchLive._fails=(fetchLive._fails||0)+1;
+    if(!silent){
+      toast("Couldn't reach the scores service — check connection, or log finals manually");
+      document.getElementById("liveStamp").textContent="Scores unavailable · manual entry still works";
+    }
+  }finally{
+    btn.disabled=false; btn.innerHTML=old;
+    fetchLive._busy=false;
+  }
+}
+
+// ---------- auto live refresh ----------
+const LIVE_INTERVAL = 3*60*1000;   // re-check every 3 minutes
+function tournamentActive(){
+  // only bother fetching while there could be games on (yesterday → today has fixtures)
+  const today=realToday(), from=fmtKey(new Date(Date.now()-36*3600*1000));
+  return ORDER.some(d=>d>=from && d<=today && (SCHEDULE[d].matches||[]).length>0);
+}
+function maybeAutoLive(){
+  if((fetchLive._fails||0)>=3) return;             // repeatedly unreachable — stop retrying quietly
+  if(!tournamentActive()) return;
+  const last=pool.live && pool.live._meta && pool.live._meta.ts || 0;
+  if(Date.now()-last < LIVE_INTERVAL*0.8) return;  // someone (maybe a teammate) fetched recently
+  fetchLive(true);
+}
+
+// ---------- init ----------
+let _poolSig="";
+async function syncPool(){
+  // pull teammates' updates without disturbing typing
+  if(document.activeElement && (document.activeElement.id==="nameInput"||/^r[ab]_/.test(document.activeElement.id||""))) return;
+  const before=JSON.stringify(pool);
+  await loadPool();
+  if(me && !pool.picks[me]) pool.picks[me]={};
+  const after=JSON.stringify(pool);
+  if(after!==before){ _poolSig=after; render(); }
+}
+
+(async function init(){
+  const vt=document.getElementById("verTag"); if(vt) vt.textContent="Matchday Board "+APP_VER;
+  await loadPool();
+  await loadMe();
+  if(me && !pool.picks[me]) pool.picks[me] = {};
+  current=pickDefaultDay();
+  render();
+  if(storeMode()!=="local") setInterval(syncPool, 15000);  // refresh from teammates every 15s
+  maybeAutoLive();                                          // grab live scores right away
+  setInterval(maybeAutoLive, 60000);                        // then keep them fresh automatically
+})();
+</script>
+</body>
+</html>
+
+<!--
+================================================================
+ HOW TO SHARE ONE POOL WITH THE WHOLE TEAM  (free, ~3 minutes)
+================================================================
+By itself this file keeps picks only in your own browser. To make
+everyone share the same picks, results and leaderboard, point it at
+a free Firebase Realtime Database:
+
+ 1. Go to https://console.firebase.google.com → "Add project"
+    (any name, you can skip Google Analytics).
+
+ 2. In the left menu: Build → Realtime Database → "Create Database".
+    - Pick a location, then choose "Start in TEST MODE" and Enable.
+      (Test mode = anyone with the URL can read/write. Fine for a
+       casual office pool. It auto-expires in 30 days — to keep it
+       going, open Realtime Database → Rules and set both ".read"
+       and ".write" to true.)
+
+ 3. Copy the database URL shown at the top of the Data tab. It looks
+    like:  https://your-project-default-rtdb.firebaseio.com
+
+ 4. Near the TOP of this file, find:
+        const CONFIG = { dbUrl: "" };
+    and paste your URL between the quotes:
+        const CONFIG = { dbUrl: "https://your-project-default-rtdb.firebaseio.com" };
+
+ 5. Share the file with the team. Easiest way: drag this single .html
+    file onto https://app.netlify.com/drop (free) and share the link,
+    or host it on GitHub Pages / your intranet. Everyone who opens it
+    now shares the same pool and sees each other's picks live.
+
+Notes
+ - Live scores come from ESPN's free public scoreboard feed and work
+   in ANY browser — no key, no cost. They refresh automatically every
+   few minutes while games are on. If that feed is ever unreachable,
+   the board falls back to Claude's API (inside Claude only) and then
+   to manual entry — the "Final score" box under each match, which IS
+   shared with everyone through the database.
+ - Guardrails: matches that haven't kicked off never show scores,
+   manual entry is hidden until a game starts, and scores are
+   validated before saving.
+ - Test mode is open to anyone with the URL; don't put anything
+   sensitive in it. For more control, set Firebase Auth + rules.
+================================================================
+-->
+
